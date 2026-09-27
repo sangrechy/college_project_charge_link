@@ -1,83 +1,52 @@
-﻿# ChargeLink - Smart Charging Controller & Telemetry System
+# ChargeLink ⚡🔋
 
-A college engineering project delivering an intelligent charging management and telemetry system combining custom ESP32 hardware and a cross-platform Flutter mobile application.
-
-## 📱 Prebuilt Android APK
-
-You can download and install the latest standalone release build directly:
-- **[ChargeLink-v3-release.apk](apks/ChargeLink-v3-release.apk)** (v3.0.0, Release Mode, 46.5 MB)
+**ChargeLink** is an intelligent charging controller and real-time telemetry system combining custom ESP32 hardware and a cross-platform Flutter mobile application.
 
 ---
 
-## ⚡ Overview
+## 📂 Repository Structure & Releases
 
-ChargeLink bridges physical charging hardware with an intuitive mobile dashboard over Bluetooth Low Energy (BLE):
-- **ESP32 Smart Box**: Monitors input/output voltage, current, and wattage in real time via an INA219 sensor, controls charging relay paths, and provides voice alerts.
-- **Flutter Mobile App (pplication_v3)**: Displays real-time live telemetry comparing charger output vs. phone intake, computes cable transmission loss and efficiency, tracks battery % and phone temperature history (Day/Week views), and persists historical telemetry for 30–60 days via SQLite.
-- **Hardware-Aware Battery Telemetry**: Includes dual-cell battery compensation (e.g. OnePlus / Oppo dual-cell architecture) and active display/system load compensation for accurate power readings.
+The project code is organized into versioned release directories:
 
----
-
-## 📁 Repository Structure
-
-`
-charge_link/
-├── apks/
-│   └── ChargeLink-v3-release.apk # Standalone pre-compiled Android release APK
-├── application/
-│   ├── application_v3/           # Current Flutter mobile application (v3.0.0)
-│   └── application_v2/           # Previous iteration (v2.0.0)
-├── doc/
-│   ├── esp32_api.md              # ESP32 BLE protocol & GATT specification
-│   ├── 1 review.pdf              # Project review presentation
-│   ├── flow charts.pdf           # Architectural flow charts
-│   └── demo_sim.mp4              # Demonstration video
-└── firmware/
-    ├── SmartChargeBox/           # ESP32 Arduino firmware (v1.0.1)
-    │   ├── SmartChargeBox.ino
-    │   ├── charging_started.h
-    │   ├── charging_stopped.h
-    │   └── power_limit.h
-    └── audio_tools/              # Voice alert audio assets & wav-to-header conversion
-        ├── wav_to_h.py
-        └── *.wav
-`
+| Release | Status | Architecture & Highlights |
+| :--- | :--- | :--- |
+| [**`v1/`**](v1/README.md) | **Active / Production** | Dual-cell aware mobile charging dashboard with BLE telemetry, SQLite power persistence, INA219 current sensing, automated relay cutoffs, and voice alerts. |
 
 ---
 
-## 🚀 Getting Started
+## 🧭 v1 Subfolder Documentation
 
-### Install Prebuilt APK
-1. Download [ChargeLink-v3-release.apk](apks/ChargeLink-v3-release.apk) to your Android device.
-2. Open the file and allow "Install unknown apps" if prompted.
-3. Grant Nearby Devices (BLE) permissions when prompted.
+For technical details, specifications, and setup instructions, refer to each subfolder inside `v1/`:
 
-### Build Flutter App from Source (pplication_v3)
+| Subfolder | Documentation | Highlights |
+| :--- | :--- | :--- |
+| [**`v1/apks/`**](v1/apks/ChargeLink-v3-release.apk) | [**Prebuilt Android APK**](v1/apks/) | Pre-compiled standalone release APK (`ChargeLink-v3-release.apk`, v3.0.0). |
+| [**`v1/application/`**](v1/application/) | [**Flutter Application**](v1/application/) | Flutter mobile app source code containing `application_v3` (production) and `application_v2`. |
+| [**`v1/firmware/`**](v1/firmware/) | [**ESP32 Firmware**](v1/firmware/) | `SmartChargeBox` Arduino sketch (INA219 sensing, BLE GATT server, relay control) and audio generation tools. |
+| [**`v1/doc/`**](v1/doc/) | [**Project Documents**](v1/doc/) | BLE protocol specs (`esp32_api.md`), system flowcharts, review presentations, and demo simulations. |
+| [**`v1/res/`**](v1/res/) | [**Audio & Resources**](v1/res/) | Raw voice prompt audio WAV files and conversion utilities. |
 
-1. **Navigate to the application folder**:
-   `ash
-   cd application/application_v3
-   `
+---
 
-2. **Install dependencies**:
-   `ash
-   flutter pub get
-   `
+## ⚡ Quick Start (v1)
 
-3. **Run on a connected Android / iOS device**:
-   `ash
-   flutter run
-   `
+### 1. Install Android APK
+Download and install [**`v1/apks/ChargeLink-v3-release.apk`**](v1/apks/ChargeLink-v3-release.apk) directly on your Android phone.
 
-### ESP32 Firmware
+### 2. Run Flutter App from Source
+```bash
+cd v1/application/application_v3
+flutter pub get
+flutter run
+```
 
-1. Open irmware/SmartChargeBox/SmartChargeBox.ino in Arduino IDE or PlatformIO.
-2. Select your ESP32 board and configure serial baud rate to 115200.
-3. Required libraries: Adafruit_INA219, ESP32 BLE Arduino.
-4. Compile and flash to the Smart Charge Box.
+### 3. Flash ESP32 Firmware
+1. Open `v1/firmware/SmartChargeBox/SmartChargeBox.ino` in Arduino IDE or PlatformIO.
+2. Install required libraries: `Adafruit_INA219`, `ESP32 BLE Arduino`.
+3. Compile and flash to your ESP32 controller.
 
 ---
 
 ## 📜 License & Acknowledgments
 
-Developed as a college engineering project (Semester 5).
+Developed as a college engineering project (Semester 5 CCP / EP).

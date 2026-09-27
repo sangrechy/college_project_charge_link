@@ -16,7 +16,7 @@
 **/android/app/profile/
 **/android/app/release/
 **/*.apk
-!apks/*.apk
+!**/apks/*.apk
 **/*.aab
 **/*.jks
 **/*.keystore
