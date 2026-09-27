@@ -21,7 +21,7 @@ For technical details, specifications, and setup instructions, refer to each sub
 | Subfolder | Documentation | Highlights |
 | :--- | :--- | :--- |
 | [**`v1/apks/`**](v1/apks/ChargeLink-v3-release.apk) | [**Prebuilt Android APK**](v1/apks/) | Pre-compiled standalone release APK (`ChargeLink-v3-release.apk`, v3.0.0). |
-| [**`v1/application/`**](v1/application/) | [**Flutter Application**](v1/application/) | Flutter mobile app source code containing `application_v3` (production) and `application_v2`. |
+| [**`v1/application/`**](v1/application/) | [**Flutter Application**](v1/application/) | Flutter mobile app source code containing `application_v2` (production) and `application_v1`. |
 | [**`v1/firmware/`**](v1/firmware/) | [**ESP32 Firmware**](v1/firmware/) | `SmartChargeBox` Arduino sketch (INA219 sensing, BLE GATT server, relay control) and audio generation tools. |
 | [**`v1/doc/`**](v1/doc/) | [**Project Documents**](v1/doc/) | BLE protocol specs (`esp32_api.md`), system flowcharts, review presentations, and demo simulations. |
 | [**`v1/res/`**](v1/res/) | [**Audio & Resources**](v1/res/) | Raw voice prompt audio WAV files and conversion utilities. |
@@ -35,7 +35,7 @@ Download and install [**`v1/apks/ChargeLink-v3-release.apk`**](v1/apks/ChargeLin
 
 ### 2. Run Flutter App from Source
 ```bash
-cd v1/application/application_v3
+cd v1/application/application_v2
 flutter pub get
 flutter run
 ```

@@ -13,7 +13,7 @@ You can download and install the latest standalone release build directly:
 
 ChargeLink bridges physical charging hardware with an intuitive mobile dashboard over Bluetooth Low Energy (BLE):
 - **ESP32 Smart Box**: Monitors input/output voltage, current, and wattage in real time via an INA219 sensor, controls charging relay paths, and provides voice alerts.
-- **Flutter Mobile App (application_v3)**: Displays real-time live telemetry comparing charger output vs. phone intake, computes cable transmission loss and efficiency, tracks battery % and phone temperature history (Day/Week views), and persists historical telemetry for 30–60 days via SQLite.
+- **Flutter Mobile App (application_v2)**: Displays real-time live telemetry comparing charger output vs. phone intake, computes cable transmission loss and efficiency, tracks battery % and phone temperature history (Day/Week views), and persists historical telemetry for 30–60 days via SQLite.
 - **Hardware-Aware Battery Telemetry**: Includes dual-cell battery compensation (e.g. OnePlus / Oppo dual-cell architecture) and active display/system load compensation for accurate power readings.
 
 ---
@@ -25,8 +25,8 @@ v1/
 ├── apks/
 │   └── ChargeLink-v3-release.apk # Standalone pre-compiled Android release APK
 ├── application/
-│   ├── application_v3/           # Current Flutter mobile application (v3.0.0)
-│   └── application_v2/           # Previous iteration (v2.0.0)
+│   ├── application_v2/           # Current Flutter mobile application (v2.0.0)
+│   └── application_v1/           # Previous iteration (v1.0.0)
 ├── doc/
 │   ├── esp32_api.md              # ESP32 BLE protocol & GATT specification
 │   ├── 1 review.pdf              # Project review presentation
@@ -52,11 +52,11 @@ v1/
 2. Open the file and allow "Install unknown apps" if prompted.
 3. Grant Nearby Devices (BLE) permissions when prompted.
 
-### Build Flutter App from Source (application_v3)
+### Build Flutter App from Source (application_v2)
 
 1. **Navigate to the application folder**:
    ```bash
-   cd application/application_v3
+   cd application/application_v2
    ```
 
 2. **Install dependencies**:

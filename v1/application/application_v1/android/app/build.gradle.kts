@@ -5,9 +5,9 @@ plugins {
 }
 
 android {
-    namespace = "com.chargelink.application_v3"
+    namespace = "com.example.application_v2"
     compileSdk = 37
-
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -16,7 +16,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.chargelink.application_v3"
+        applicationId = "com.example.application_v2"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -47,3 +47,4 @@ kotlin {
 flutter {
     source = "../.."
 }
+

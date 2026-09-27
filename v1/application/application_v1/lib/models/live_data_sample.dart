@@ -1,3 +1,8 @@
+/// One `live_data` packet from the LIVE DATA characteristic.
+///
+/// Fields match apis.txt exactly:
+/// timestamp, voltage_v, current_a, power_w, charging, path_enabled,
+/// charging_limit, ina219_available, session_energy_wh, total_energy_wh.
 class LiveDataSample {
   const LiveDataSample({
     required this.timestamp,
@@ -17,14 +22,26 @@ class LiveDataSample {
   final double voltageV;
   final double currentA;
   final double powerW;
+
+  /// Actual charging state derived from INA219 current measurement.
   final bool charging;
+
+  /// Physical relay / charging-path state. NOT the same as [charging].
   final bool pathEnabled;
+
   final int chargingLimit;
   final bool ina219Available;
   final double sessionEnergyWh;
   final double totalEnergyWh;
+
+  /// Local device clock at the moment this sample was parsed, used for
+  /// x-axis positioning in the rolling graphs (the ESP32 timestamp is not
+  /// wall-clock time).
   final DateTime receivedAt;
 
+  /// Parses a `live_data` packet, returning null on any malformed/missing
+  /// field rather than throwing — BLE data from an external device must
+  /// never crash the app.
   static LiveDataSample? tryParse(Map<String, dynamic> json) {
     try {
       final data = json['data'];
@@ -34,7 +51,7 @@ class LiveDataSample {
       num req(String key) {
         final v = d[key];
         if (v is num) return v;
-        throw FormatException('missing field $key');
+        throw FormatException('missing/invalid field: $key');
       }
 
       return LiveDataSample(
@@ -46,8 +63,8 @@ class LiveDataSample {
         pathEnabled: d['path_enabled'] as bool? ?? false,
         chargingLimit: (d['charging_limit'] as num?)?.toInt() ?? 100,
         ina219Available: d['ina219_available'] as bool? ?? false,
-        sessionEnergyWh: (d['session_energy_wh'] as num?)?.toDouble() ?? 0.0,
-        totalEnergyWh: (d['total_energy_wh'] as num?)?.toDouble() ?? 0.0,
+        sessionEnergyWh: (d['session_energy_wh'] as num?)?.toDouble() ?? 0,
+        totalEnergyWh: (d['total_energy_wh'] as num?)?.toDouble() ?? 0,
         receivedAt: DateTime.now(),
       );
     } catch (_) {

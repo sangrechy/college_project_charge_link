@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import '../services/esp32/esp32_service.dart';
+
+import '../services/ble/esp32_service.dart';
 
 enum CommandStatus { idle, sending }
 
@@ -8,15 +9,22 @@ class ChargingController extends ChangeNotifier {
 
   final Esp32Service _esp32;
 
+  /// Physical relay / charging-path state.
   bool pathEnabled = false;
+
+  /// Actual charging state derived from INA219 current — NOT the same as
+  /// [pathEnabled]; the path can be enabled while the phone isn't drawing
+  /// enough current to count as actively charging.
   bool charging = false;
+
   int chargingLimit = 80;
 
   CommandStatus status = CommandStatus.idle;
   String? lastError;
+  String? statusMessage;
 
-  bool autoStopTriggered = false;
-  bool autoStopCompleted = false;
+  // Guards against sending stop_charging repeatedly once the limit is hit.
+  bool _autoStopTriggered = false;
 
   void updateFromLiveSample({
     required bool pathEnabled,
@@ -27,32 +35,32 @@ class ChargingController extends ChangeNotifier {
     this.charging = charging;
     this.chargingLimit = chargingLimit;
 
-    if (!pathEnabled) {
-      autoStopTriggered = false;
-    }
+    // Reset the guard once the path is no longer enabled (e.g. user
+    // manually restarted charging after an auto-stop).
+    if (!pathEnabled) _autoStopTriggered = false;
+
     notifyListeners();
   }
 
   Future<void> refreshFromDevice() async {
     try {
       final s = await _esp32.getDeviceStatus();
-      pathEnabled = s.pathEnabled;
+      pathEnabled = s.relayState;
       charging = s.charging;
-      chargingLimit = s.chargingLimit;
+      if (s.chargingLimit != null) chargingLimit = s.chargingLimit!;
       notifyListeners();
-    } catch (_) {}
+    } catch (_) {
+      // Best-effort refresh; live stream remains the source of truth.
+    }
   }
 
   Future<void> start() async {
     status = CommandStatus.sending;
     lastError = null;
-    autoStopCompleted = false;
     notifyListeners();
-
     try {
       await _esp32.startCharging();
-      pathEnabled = true;
-      autoStopTriggered = false;
+      _autoStopTriggered = false;
       await refreshFromDevice();
     } catch (e) {
       lastError = 'Could not start charging: $e';
@@ -66,11 +74,8 @@ class ChargingController extends ChangeNotifier {
     status = CommandStatus.sending;
     lastError = null;
     notifyListeners();
-
     try {
       await _esp32.stopCharging();
-      pathEnabled = false;
-      charging = false;
       await refreshFromDevice();
     } catch (e) {
       lastError = 'Could not stop charging: $e';
@@ -84,35 +89,34 @@ class ChargingController extends ChangeNotifier {
     final previous = chargingLimit;
     chargingLimit = percentage;
     notifyListeners();
-
     try {
       await _esp32.setChargingLimit(percentage);
     } catch (e) {
       chargingLimit = previous;
-      lastError = 'Could not set charging limit: $e';
+      lastError = 'Could not update charging limit: $e';
       notifyListeners();
     }
   }
 
-  Future<void> evaluateAutoStop({
-    required int? batteryPercentage,
-    required bool autoStopEnabled,
-  }) async {
-    if (!autoStopEnabled) return;
+  /// Called whenever a fresh phone battery percentage is available.
+  /// Sends stop_charging exactly once per charging session when the
+  /// configured limit is reached — never repeatedly on every update.
+  Future<void> evaluateAutoStop(int? batteryPercentage) async {
     if (batteryPercentage == null) return;
     if (!pathEnabled) return;
-    if (autoStopTriggered) return;
+    if (_autoStopTriggered) return;
 
     if (batteryPercentage >= chargingLimit) {
-      autoStopTriggered = true;
-      autoStopCompleted = true;
+      _autoStopTriggered = true;
+      statusMessage =
+          'Charging stopped — battery reached the selected $chargingLimit% limit.';
       notifyListeners();
       await stop();
     }
   }
 
-  void dismissAutoStopAlert() {
-    autoStopCompleted = false;
+  void clearStatusMessage() {
+    statusMessage = null;
     notifyListeners();
   }
 }

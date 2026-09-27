@@ -1,60 +1,60 @@
 class DeviceStatus {
   const DeviceStatus({
     required this.connected,
-    required this.charging,
-    required this.relayState,
     required this.deviceName,
-    this.chargingLimit,
-    this.ina219Available,
+    required this.modelName,
+    required this.hardwareVersion,
+    required this.firmwareVersion,
+    required this.protocolVersion,
+    required this.ina219Available,
+    required this.pathEnabled,
+    required this.charging,
+    required this.chargingLimit,
+    required this.uptimeSeconds,
   });
 
   final bool connected;
-
-  /// Actual charging state, derived on the ESP32 from INA219 current.
-  final bool charging;
-
-  /// Physical relay / charging-path state. NOT the same as [charging] —
-  /// the path can be enabled while the phone isn't drawing enough current
-  /// to count as actively charging.
-  final bool relayState;
-
   final String deviceName;
-  final int? chargingLimit;
-  final bool? ina219Available;
-
-  DeviceStatus copyWith({
-    bool? connected,
-    bool? charging,
-    bool? relayState,
-    String? deviceName,
-    int? chargingLimit,
-    bool? ina219Available,
-  }) {
-    return DeviceStatus(
-      connected: connected ?? this.connected,
-      charging: charging ?? this.charging,
-      relayState: relayState ?? this.relayState,
-      deviceName: deviceName ?? this.deviceName,
-      chargingLimit: chargingLimit ?? this.chargingLimit,
-      ina219Available: ina219Available ?? this.ina219Available,
-    );
-  }
+  final String modelName;
+  final String hardwareVersion;
+  final String firmwareVersion;
+  final String protocolVersion;
+  final bool ina219Available;
+  final bool pathEnabled;
+  final bool charging;
+  final int chargingLimit;
+  final int uptimeSeconds;
 
   factory DeviceStatus.disconnected() => const DeviceStatus(
         connected: false,
+        deviceName: 'Charge Link',
+        modelName: 'CL-SCB-01',
+        hardwareVersion: '1.0',
+        firmwareVersion: '1.0.1',
+        protocolVersion: '1.0',
+        ina219Available: false,
+        pathEnabled: false,
         charging: false,
-        relayState: false,
-        deviceName: 'CHARGE LINK',
+        chargingLimit: 80,
+        uptimeSeconds: 0,
       );
 
   factory DeviceStatus.fromJson(Map<String, dynamic> json) {
+    final dev = json['device'] as Map<String, dynamic>? ?? {};
     return DeviceStatus(
-      connected: true,
+      connected: json['connected'] as bool? ?? true,
+      deviceName: dev['name']?.toString() ?? json['name']?.toString() ?? 'Charge Link',
+      modelName: dev['model']?.toString() ?? json['model']?.toString() ?? 'CL-SCB-01',
+      hardwareVersion: dev['hardware']?.toString() ?? json['hardware_version']?.toString() ?? '1.0',
+      firmwareVersion: dev['firmware']?.toString() ?? json['firmware_version']?.toString() ?? '1.0.1',
+      protocolVersion: dev['protocol']?.toString() ?? json['protocol_version']?.toString() ?? '1.0',
+      ina219Available: json['ina219_available'] as bool? ?? true,
+      pathEnabled: json['path_enabled'] as bool? ?? false,
       charging: json['charging'] as bool? ?? false,
-      relayState: json['path_enabled'] as bool? ?? false,
-      deviceName: 'CHARGE LINK',
-      chargingLimit: (json['charging_limit'] as num?)?.toInt(),
-      ina219Available: json['ina219_available'] as bool?,
+      chargingLimit: (json['charging_limit'] as num?)?.toInt() ??
+          (json['percentage'] as num?)?.toInt() ??
+          80,
+      uptimeSeconds: (json['uptime_seconds'] as num?)?.toInt() ?? 0,
     );
   }
 }
